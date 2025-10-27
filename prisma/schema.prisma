@@ -1,0 +1,398 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ORGANIZACIÓN ====================
+
+model Organization {
+  id            String   @id @default(cuid())
+  nombre        String
+  slug          String   @unique
+  logo          String?
+  ownerId       String
+  
+  regiones      Region[]
+  usuarios      User[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("organizations")
+}
+
+// ==================== REGIONES ====================
+
+model Region {
+  id              String   @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  
+  pais            String
+  ciudad          String
+  moneda          String   @default("USD")
+  timezone        String   @default("America/Guayaquil")
+  
+  impuesto        Decimal  @default(0) @db.Decimal(5,2)
+  anticipoPct     Int      @default(30)
+  garantiaDias    Int      @default(90)
+  
+  politicas       Json?
+  
+  leads           Lead[]
+  cotizaciones    Quote[]
+  ordenes         Order[]
+  servicios       Service[]
+  maestros        User[]   @relation("MaestrosRegion")
+  
+  activo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([organizationId, pais, ciudad])
+  @@map("regiones")
+}
+
+// ==================== USUARIOS ====================
+
+enum RolUsuario {
+  OWNER
+  ADMIN
+  MAESTRO
+}
+
+model User {
+  id              String      @id @default(cuid())
+  clerkId         String?     @unique
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  
+  nombre          String
+  email           String?     @unique
+  telefono        String
+  ci              String?
+  
+  rol             RolUsuario
+  regionId        String?
+  region          Region?     @relation("MaestrosRegion", fields: [regionId], references: [id])
+  
+  especialidades  String[]
+  calificacion    Decimal?    @db.Decimal(3,2)
+  
+  cuentaBanco     String?
+  
+  activo          Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  ordenesAsignadas Order[]
+  
+  @@map("users")
+}
+
+// ==================== SERVICIOS ====================
+
+model Service {
+  id              String   @id @default(cuid())
+  regionId        String
+  region          Region   @relation(fields: [regionId], references: [id])
+  
+  slug            String
+  nombre          String
+  descripcion     String
+  icono           String?
+  
+  precioBase      Decimal  @db.Decimal(10,2)
+  unidad          String
+  
+  checklist       Json?
+  
+  orden           Int      @default(0)
+  activo          Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  leads           Lead[]
+  
+  @@unique([regionId, slug])
+  @@map("services")
+}
+
+// ==================== LEADS ====================
+
+enum EstadoLead {
+  NUEVO
+  CONTACTADO
+  COTIZANDO
+  CONVERTIDO
+  DESCARTADO
+}
+
+model Lead {
+  id              String      @id @default(cuid())
+  codigo          String      @unique
+  
+  regionId        String
+  region          Region      @relation(fields: [regionId], references: [id])
+  
+  serviceId       String
+  service         Service     @relation(fields: [serviceId], references: [id])
+  
+  clienteNombre   String
+  clienteTelefono String
+  clienteEmail    String?
+  direccion       String
+  referencia      String?
+  
+  descripcion     String      @db.Text
+  fotos           String[]
+  urgente         Boolean     @default(false)
+  
+  fuente          String?
+  utmSource       String?
+  utmCampaign     String?
+  
+  estado          EstadoLead  @default(NUEVO)
+  
+  aiAnalisis      Json?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  cotizaciones    Quote[]
+  
+  @@index([estado, createdAt])
+  @@map("leads")
+}
+
+// ==================== COTIZACIONES ====================
+
+enum EstadoQuote {
+  BORRADOR
+  ENVIADA
+  VISTA
+  APROBADA
+  RECHAZADA
+  EXPIRADA
+  CONVERTIDA
+}
+
+model Quote {
+  id              String      @id @default(cuid())
+  codigo          String      @unique
+  
+  leadId          String
+  lead            Lead        @relation(fields: [leadId], references: [id])
+  
+  regionId        String
+  region          Region      @relation(fields: [regionId], references: [id])
+  
+  items           QuoteItem[]
+  
+  subtotal        Decimal     @db.Decimal(10,2)
+  impuesto        Decimal     @db.Decimal(10,2)
+  total           Decimal     @db.Decimal(10,2)
+  
+  anticipo        Decimal     @db.Decimal(10,2)
+  saldo           Decimal     @db.Decimal(10,2)
+  
+  validezDias     Int         @default(7)
+  fechaExpira     DateTime
+  
+  pdfUrl          String?
+  
+  estado          EstadoQuote @default(BORRADOR)
+  
+  enviadaEn       DateTime?
+  aprobadaEn      DateTime?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  orden           Order?
+  
+  @@index([estado, createdAt])
+  @@map("quotes")
+}
+
+enum TipoQuoteItem {
+  MANO_OBRA
+  MATERIAL
+  VISITA
+  URGENCIA
+  OTRO
+}
+
+model QuoteItem {
+  id              String        @id @default(cuid())
+  quoteId         String
+  quote           Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  tipo            TipoQuoteItem
+  descripcion     String
+  cantidad        Decimal       @db.Decimal(10,2)
+  precioUnitario  Decimal       @db.Decimal(10,2)
+  total           Decimal       @db.Decimal(10,2)
+  
+  orden           Int           @default(0)
+  
+  @@map("quote_items")
+}
+
+// ==================== ÓRDENES ====================
+
+enum EstadoOrder {
+  ANTICIPO_PENDIENTE
+  ANTICIPO_PAGADO
+  AGENDADA
+  EN_CAMINO
+  EN_EJECUCION
+  FINALIZADA
+  SALDO_PENDIENTE
+  CERRADA
+  CANCELADA
+}
+
+model Order {
+  id              String       @id @default(cuid())
+  codigo          String       @unique
+  
+  quoteId         String       @unique
+  quote           Quote        @relation(fields: [quoteId], references: [id])
+  
+  regionId        String
+  region          Region       @relation(fields: [regionId], references: [id])
+  
+  maestroId       String?
+  maestro         User?        @relation(fields: [maestroId], references: [id])
+  costoMaestro    Decimal      @default(0) @db.Decimal(10,2)
+  margen          Decimal      @default(0) @db.Decimal(10,2)
+  
+  fechaAgendada   DateTime?
+  fechaInicio     DateTime?
+  fechaFin        DateTime?
+  
+  fotosAntes      String[]
+  fotosDurante    String[]
+  fotosDespues    String[]
+  
+  checklistData   Json?
+  
+  estado          EstadoOrder  @default(ANTICIPO_PENDIENTE)
+  
+  notasAdmin      String?      @db.Text
+  notasMaestro    String?      @db.Text
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  pagos           Payment[]
+  garantias       WarrantyCase[]
+  
+  @@index([estado, maestroId])
+  @@map("orders")
+}
+
+// ==================== PAGOS ====================
+
+enum TipoPago {
+  ANTICIPO
+  SALDO
+  ADICIONAL
+}
+
+enum MetodoPago {
+  TRANSFERENCIA
+  EFECTIVO
+  OTRO
+}
+
+model Payment {
+  id              String      @id @default(cuid())
+  orderId         String
+  order           Order       @relation(fields: [orderId], references: [id])
+  
+  tipo            TipoPago
+  metodo          MetodoPago
+  monto           Decimal     @db.Decimal(10,2)
+  
+  comprobanteUrl  String?
+  referencia      String?
+  
+  validado        Boolean     @default(false)
+  validadoPor     String?
+  
+  fecha           DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  
+  @@map("payments")
+}
+
+// ==================== GARANTÍAS ====================
+
+enum EstadoGarantia {
+  REPORTADA
+  EN_REVISION
+  APROBADA
+  RECHAZADA
+  EN_REPARACION
+  RESUELTA
+}
+
+model WarrantyCase {
+  id              String          @id @default(cuid())
+  codigo          String          @unique
+  
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id])
+  
+  clienteReporte  String          @db.Text
+  fotos           String[]
+  fechaReporte    DateTime        @default(now())
+  
+  cubierta        Boolean?
+  motivoRechazo   String?         @db.Text
+  
+  ordenReparacion String?
+  resolucion      String?         @db.Text
+  
+  estado          EstadoGarantia  @default(REPORTADA)
+  
+  resueltaEn      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@map("warranty_cases")
+}
+
+// ==================== AUDITORÍA ====================
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  
+  entidad         String
+  entidadId       String
+  accion          String
+  
+  userId          String?
+  userName        String?
+  
+  antes           Json?
+  despues         Json?
+  
+  ip              String?
+  userAgent       String?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([entidad, entidadId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
