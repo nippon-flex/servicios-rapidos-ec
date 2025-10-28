@@ -101,9 +101,12 @@ export default async function LeadsPage() {
                   <tr key={lead.id} className="hover:bg-gray-50">
                     {/* COLUMNA 1: Código y Cliente */}
                     <td className="px-6 py-4">
-                      <div className="text-sm font-semibold text-gray-900">
+                      <Link 
+                        href={`/dashboard/leads/${lead.id}`}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                      >
                         {lead.codigo}
-                      </div>
+                      </Link>
                       <div className="text-sm text-gray-600">{lead.clienteNombre}</div>
                       <div className="text-xs text-gray-500">{lead.clienteTelefono}</div>
                     </td>
@@ -161,18 +164,21 @@ export default async function LeadsPage() {
                       <div className="flex flex-col gap-2">
                         {/* Botón WhatsApp */}
                         <a
-                          href={`https://wa.me/${lead.clienteTelefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.clienteNombre}, te contacto sobre tu solicitud ${lead.codigo}`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-green-600 hover:text-green-900 font-medium"
-                        >
+  href={`https://wa.me/${lead.clienteTelefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.clienteNombre}, te contacto sobre tu solicitud ${lead.codigo}`)}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-green-600 hover:text-green-900 font-medium"
+>
                           📱 WhatsApp
                         </a>
                         
-                        {/* Botón Crear Cotización (próximamente) */}
-                        <button className="text-blue-600 hover:text-blue-900 font-medium text-left">
-                          📋 Cotizar
-                        </button>
+                        {/* Botón Ver Detalle */}
+                        <Link
+                          href={`/dashboard/leads/${lead.id}`}
+                          className="text-blue-600 hover:text-blue-900 font-medium"
+                        >
+                          👁️ Ver Detalle
+                        </Link>
                       </div>
                     </td>
                   </tr>

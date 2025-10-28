@@ -33,7 +33,7 @@ async function main() {
       ciudad: 'Quito',
       moneda: 'USD',
       timezone: 'America/Guayaquil',
-      impuesto: 12, // IVA 12%
+      impuesto: 15, // IVA 15%
       anticipoPct: 30,
       garantiaDias: 90,
       politicas: {
