@@ -174,16 +174,23 @@ export default async function LeadDetallePage({
 
                 {/* Botón Crear Cotización */}
                 {lead.cotizaciones.length === 0 ? (
-                  <Button asChild className="w-full" size="lg">
-                    <Link href={`/dashboard/cotizaciones/nueva?leadId=${lead.id}`}>
-                      📋 Crear Cotización
-                    </Link>
-                  </Button>
-                ) : (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-700">
-                    ✅ Ya tiene {lead.cotizaciones.length} cotización(es)
-                  </div>
-                )}
+  <Button asChild className="w-full" size="lg">
+    <Link href={`/dashboard/cotizaciones/nueva?leadId=${lead.id}`}>
+      📋 Crear Cotización
+    </Link>
+  </Button>
+) : (
+  <div className="space-y-2">
+    <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-700 text-center">
+      ✅ Ya tiene {lead.cotizaciones.length} cotización(es)
+    </div>
+    <Button asChild className="w-full" size="lg" variant="outline">
+      <Link href={`/dashboard/cotizaciones/${lead.cotizaciones[0].id}`}>
+        👁️ Ver Cotización
+      </Link>
+    </Button>
+  </div>
+)}
               </div>
             </div>
 
