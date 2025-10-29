@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import RegistrarPagoButton from './RegistrarPagoButton'
+import AsignarMaestroButton from './AsignarMaestroButton'
 
 export default async function OrdenDetallePage({
   params,
@@ -247,6 +248,11 @@ export default async function OrdenDetallePage({
               <h3 className="text-lg font-semibold text-gray-900 mb-4">⚡ Acciones</h3>
               
               <div className="space-y-3">
+                {/* Asignar Maestro */}
+<AsignarMaestroButton
+  ordenId={orden.id}
+  maestroActual={orden.maestro}
+/>
                 {/* Botón Registrar Anticipo */}
                 {orden.estado === 'ANTICIPO_PENDIENTE' && (
                   <RegistrarPagoButton

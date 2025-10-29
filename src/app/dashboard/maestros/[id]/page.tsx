@@ -38,7 +38,6 @@ export default async function MaestroDetallePage({
     notFound()
   }
 
-  // Calcular totales
   const totalOrdenesAsignadas = maestro.ordenesAsignadas.length
   const ordenesActivas = maestro.ordenesAsignadas.filter(
     (o) => !['CERRADA', 'CANCELADA'].includes(o.estado)
@@ -138,56 +137,105 @@ export default async function MaestroDetallePage({
             {/* HISTORIAL DE ÓRDENES */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Historial de Órdenes
+                Órdenes Asignadas
               </h2>
               
               {maestro.ordenesAsignadas.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <div className="text-4xl mb-2">📋</div>
                   <p>No hay órdenes asignadas</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Las órdenes aparecerán aquí cuando las asignes
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {maestro.ordenesAsignadas.map((orden) => (
-                    <div
-                      key={orden.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/dashboard/ordenes/${orden.id}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            {orden.codigo}
-                          </Link>
-                          <span
-                            className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                              orden.estado === 'CERRADA'
-                                ? 'bg-green-100 text-green-800'
-                                : orden.estado === 'ANTICIPO_PENDIENTE'
-                                ? 'bg-orange-100 text-orange-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}
-                          >
-                            {orden.estado.replace(/_/g, ' ')}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-sm text-gray-600">
-                          {orden.quote.lead.clienteNombre} - {orden.quote.lead.service.nombre}
-                        </div>
-                        <div className="mt-1 text-xs text-gray-500">
-                          {formatearFecha(orden.createdAt)}
+                  {maestro.ordenesAsignadas.map((orden) => {
+                    const totalPagado = orden.pagos.reduce(
+                      (sum, p) => sum + Number(p.monto),
+                      0
+                    )
+                    const pendientePago = Number(orden.quote.total) - totalPagado
+
+                    return (
+                      <div
+                        key={orden.id}
+                        className="border rounded-lg hover:border-blue-300 transition-colors"
+                      >
+                        <div className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Link
+                                  href={`/dashboard/ordenes/${orden.id}`}
+                                  className="text-lg font-semibold text-blue-600 hover:text-blue-800"
+                                >
+                                  {orden.codigo}
+                                </Link>
+                                <span
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                    orden.estado === 'CERRADA'
+                                      ? 'bg-green-100 text-green-800'
+                                      : orden.estado === 'ANTICIPO_PENDIENTE'
+                                      ? 'bg-orange-100 text-orange-800'
+                                      : orden.estado === 'ANTICIPO_PAGADO'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : 'bg-gray-100 text-gray-800'
+                                  }`}
+                                >
+                                  {orden.estado.replace(/_/g, ' ')}
+                                </span>
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Cliente: {orden.quote.lead.clienteNombre}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {orden.quote.lead.service.icono} {orden.quote.lead.service.nombre}
+                              </div>
+                              <div className="text-xs text-gray-400 mt-1">
+                                {formatearFecha(orden.createdAt)}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-gray-500">Tu pago</div>
+                              <div className="text-xl font-bold text-green-600">
+                                {formatearMoneda(Number(orden.costoMaestro))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4 pt-3 border-t">
+                            <div>
+                              <div className="text-xs text-gray-500">Total Orden</div>
+                              <div className="text-sm font-semibold text-gray-900">
+                                {formatearMoneda(Number(orden.quote.total))}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500">Cliente Pagó</div>
+                              <div className="text-sm font-semibold text-blue-600">
+                                {formatearMoneda(totalPagado)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500">Pendiente</div>
+                              <div className="text-sm font-semibold text-orange-600">
+                                {formatearMoneda(pendientePago)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {orden.estado === 'CERRADA' && (
+                            <div className="mt-3 p-2 bg-green-50 rounded text-center">
+                              <span className="text-xs font-medium text-green-800">
+                                ✅ Trabajo Completado y Pagado
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-500">Pago maestro</div>
-                        <div className="text-lg font-bold text-green-600">
-                          {formatearMoneda(Number(orden.costoMaestro))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
