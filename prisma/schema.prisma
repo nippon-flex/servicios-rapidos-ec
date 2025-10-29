@@ -92,6 +92,7 @@ model User {
   updatedAt       DateTime    @updatedAt
   
   ordenesAsignadas Order[]
+  pagosRecibidos   MaestroPago[] @relation("PagosMaestro")
   
   @@map("users")
 }
@@ -295,6 +296,7 @@ model Order {
   
   pagos           Payment[]
   garantias       WarrantyCase[]
+  pagosMaestro    MaestroPago[] @relation("PagosMaestroOrden")
   
   @@index([estado, maestroId])
   @@map("orders")
@@ -395,4 +397,28 @@ model AuditLog {
   @@index([entidad, entidadId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ==================== PAGOS A MAESTROS ====================
+
+model MaestroPago {
+  id              String   @id @default(cuid())
+  
+  maestroId       String
+  maestro         User     @relation("PagosMaestro", fields: [maestroId], references: [id])
+  
+  orderId         String?
+  order           Order?   @relation("PagosMaestroOrden", fields: [orderId], references: [id])
+  
+  monto           Decimal  @db.Decimal(10,2)
+  metodo          MetodoPago
+  referencia      String?
+  comprobanteUrl  String?
+  
+  notas           String?  @db.Text
+  
+  fecha           DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@map("maestro_pagos")
 }

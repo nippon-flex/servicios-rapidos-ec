@@ -31,6 +31,22 @@ export default async function MaestroDetallePage({
           createdAt: 'desc',
         },
       },
+      pagosRecibidos: {
+        include: {
+          order: {
+            include: {
+              quote: {
+                include: {
+                  lead: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   })
 
@@ -49,6 +65,13 @@ export default async function MaestroDetallePage({
   const totalGanado = maestro.ordenesAsignadas
     .filter((o) => o.estado === 'CERRADA')
     .reduce((sum, o) => sum + Number(o.costoMaestro), 0)
+
+  const totalPagado = maestro.pagosRecibidos.reduce(
+    (sum, p) => sum + Number(p.monto),
+    0
+  )
+
+  const pendiente = totalGanado - totalPagado
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,6 +155,53 @@ export default async function MaestroDetallePage({
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* HISTORIAL DE PAGOS RECIBIDOS */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                💰 Historial de Pagos Recibidos
+              </h2>
+              
+              {maestro.pagosRecibidos.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="text-4xl mb-2">💸</div>
+                  <p>No hay pagos registrados</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {maestro.pagosRecibidos.map((pago) => (
+                    <div
+                      key={pago.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">
+                            {pago.metodo}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {formatearFecha(pago.fecha)}
+                          </span>
+                        </div>
+                        {pago.referencia && (
+                          <div className="mt-1 text-sm text-gray-600">
+                            Ref: {pago.referencia}
+                          </div>
+                        )}
+                        {pago.order && (
+                          <div className="mt-1 text-xs text-gray-500">
+                            Orden: {pago.order.codigo} - {pago.order.quote.lead.clienteNombre}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-xl font-bold text-green-600">
+                        {formatearMoneda(Number(pago.monto))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* HISTORIAL DE ÓRDENES */}
@@ -274,6 +344,18 @@ export default async function MaestroDetallePage({
                     {formatearMoneda(totalGanado)}
                   </div>
                 </div>
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Total Pagado</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatearMoneda(totalPagado)}
+                  </div>
+                </div>
+                <div className="bg-orange-50 rounded-lg p-3">
+                  <div className="text-sm text-orange-800 mb-1">Pendiente de Pago</div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {formatearMoneda(pendiente)}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -299,6 +381,13 @@ export default async function MaestroDetallePage({
                     ✏️ Editar Información
                   </Link>
                 </Button>
+                {pendiente > 0 && (
+                  <Button asChild className="w-full bg-orange-600 hover:bg-orange-700">
+                    <Link href="/dashboard/maestros-pagos">
+                      💰 Gestionar Pagos
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
 
