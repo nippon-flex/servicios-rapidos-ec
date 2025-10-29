@@ -258,9 +258,10 @@ export default async function OrdenDetallePage({
               <div className="space-y-3">
                 {/* Asignar Maestro */}
                 <AsignarMaestroButton
-                  ordenId={orden.id}
-                  maestroActual={orden.maestro}
-                />
+  ordenId={orden.id}
+  maestroActual={orden.maestro}
+  onAsignado={() => window.location.reload()}
+/>
 
                 {/* Botón Aprobar Cotización */}
                 {orden.estado === 'ANTICIPO_PENDIENTE' && (
