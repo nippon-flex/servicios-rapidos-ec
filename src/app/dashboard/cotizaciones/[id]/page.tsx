@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -38,28 +38,33 @@ interface QuoteData {
 
 export default function CotizacionDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
-  const [quoteId, setQuoteId] = useState<string | null>(null)
+  const { id } = use(params)
   const [quote, setQuote] = useState<QuoteData | null>(null)
   const [loading, setLoading] = useState(true)
   const [generandoMensaje, setGenerandoMensaje] = useState(false)
   const [mensajeIA, setMensajeIA] = useState<string | null>(null)
 
   useEffect(() => {
-    params.then(({ id }) => {
-      setQuoteId(id)
-      // Cargar cotización
-      fetch(`/api/cotizaciones/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
+    if (!id) return
+
+    setLoading(true)
+    fetch(`/api/cotizaciones/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
           setQuote(data)
-          setLoading(false)
-        })
-        .catch((err) => {
-          console.error(err)
-          setLoading(false)
-        })
-    })
-  }, [params])
+        } else {
+          setQuote(null)
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching quote:', err)
+        setQuote(null)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [id])
 
   const generarMensaje = async () => {
     if (!quote) return
@@ -92,8 +97,21 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
     }
   }
 
-  const abrirWhatsApp = () => {
+  const abrirWhatsApp = async () => {
     if (!quote || !mensajeIA) return
+    
+    try {
+      await fetch(`/api/cotizaciones/${quote.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'ENVIADA' }),
+      })
+      
+      setQuote({ ...quote, estado: 'ENVIADA' })
+    } catch (err) {
+      console.error('Error marcando como enviada:', err)
+    }
+    
     const phone = quote.lead.clienteTelefono.replace(/[^0-9]/g, '')
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(mensajeIA)}`
     window.open(url, '_blank')
@@ -120,12 +138,21 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* HEADER */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{quote.codigo}</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold text-gray-900">{quote.codigo}</h1>
+                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                  quote.estado === 'BORRADOR' ? 'bg-gray-100 text-gray-700' :
+                  quote.estado === 'ENVIADA' ? 'bg-blue-100 text-blue-700' :
+                  quote.estado === 'APROBADA' ? 'bg-green-100 text-green-700' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {quote.estado}
+                </span>
+              </div>
               <p className="mt-1 text-sm text-gray-500">
                 Para: {quote.lead.clienteNombre} - {quote.lead.service.nombre}
               </p>
@@ -139,14 +166,11 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* CONTENIDO */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* COLUMNA PRINCIPAL */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* ITEMS */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Items</h2>
               <div className="space-y-3">
@@ -165,7 +189,6 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
                 ))}
               </div>
 
-              {/* TOTALES */}
               <div className="mt-6 space-y-2 border-t pt-4">
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">Subtotal:</span>
@@ -183,7 +206,6 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
                 </div>
               </div>
 
-              {/* ANTICIPO Y SALDO */}
               <div className="mt-4 bg-blue-50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-700">Anticipo (30%):</span>
@@ -197,13 +219,85 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
             </div>
           </div>
 
-          {/* COLUMNA LATERAL */}
           <div className="space-y-6">
             
-            {/* ACCIONES */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">⚡ Acciones</h3>
               
+              {quote.estado === 'ENVIADA' && (
+                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 mb-3">
+                    ✅ Cliente aprobó la cotización
+                  </p>
+                  <Button
+                    onClick={async () => {
+                      if (confirm('¿Confirmas que el cliente aprobó esta cotización?')) {
+                        try {
+                          await fetch(`/api/cotizaciones/${quote.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ estado: 'APROBADA' }),
+                          })
+                          setQuote({ ...quote, estado: 'APROBADA' })
+                          alert('✅ Cotización marcada como aprobada')
+                        } catch (err) {
+                          alert('Error al aprobar')
+                        }
+                      }
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    ✅ Marcar como Aprobada
+                  </Button>
+                </div>
+              )}
+
+              {quote.estado === 'APROBADA' && (
+                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 mb-3 font-semibold">
+                    🎯 Cotización aprobada - Crear orden de trabajo
+                  </p>
+                  <Button
+                    onClick={async () => {
+                      const costo = prompt('¿Cuánto le pagarás al maestro por este trabajo? (solo número, ej: 25)')
+                      if (!costo) return
+                      
+                      if (!quote?.id) {
+                        alert('❌ Error: No se encontró el ID de la cotización')
+                        return
+                      }
+                      
+                      try {
+                        const response = await fetch('/api/ordenes', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            quoteId: quote.id,
+                            costoMaestro: parseFloat(costo),
+                          }),
+                        })
+                        
+                        const data = await response.json()
+                        
+                        if (response.ok) {
+                          const margen = Number(data.order.margen)
+                          alert(`✅ Orden ${data.order.codigo} creada!\n\nMargen: $${margen.toFixed(2)}`)
+                          router.push(`/dashboard/leads/${quote.lead.id}`)
+                        } else {
+                          alert('❌ Error: ' + (data.error || 'Error desconocido'))
+                        }
+                      } catch (err) {
+                        alert('❌ Error al crear orden')
+                      }
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    size="lg"
+                  >
+                    📋 Crear Orden de Trabajo
+                  </Button>
+                </div>
+              )}
+
               {!mensajeIA ? (
                 <Button
                   onClick={generarMensaje}
@@ -236,7 +330,6 @@ export default function CotizacionDetallePage({ params }: { params: Promise<{ id
               )}
             </div>
 
-            {/* INFO */}
             <div className="bg-gray-50 rounded-lg border p-4">
               <h4 className="text-sm font-semibold text-gray-900 mb-3">ℹ️ Información</h4>
               <div className="space-y-2 text-sm">

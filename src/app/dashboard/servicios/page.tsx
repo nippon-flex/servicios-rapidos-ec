@@ -79,7 +79,7 @@ export default async function ServiciosPublicosPage() {
                 <div>
                   <span className="text-sm text-gray-500">Desde</span>
                   <p className="text-2xl font-bold text-blue-600">
-                    {formatearMoneda(servicio.precioBase)}
+                    {formatearMoneda(servicio.precioBase.toNumber())}
                   </p>
                 </div>
                 <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">

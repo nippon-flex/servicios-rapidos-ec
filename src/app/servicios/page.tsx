@@ -76,7 +76,7 @@ export default async function ServiciosPage() {
             <div className="text-sm text-gray-500">Precio promedio</div>
             <div className="text-3xl font-bold text-blue-600 mt-2">
               {formatearMoneda(
-                servicios.reduce((sum, s) => sum + Number(s.precioBase), 0) / servicios.length
+                servicios.reduce((sum, s) => sum + s.precioBase.toNumber(), 0) / servicios.length
               )}
             </div>
           </div>
@@ -122,7 +122,7 @@ export default async function ServiciosPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-gray-900">
-                      {formatearMoneda(servicio.precioBase)}
+                      {formatearMoneda(servicio.precioBase.toNumber())}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

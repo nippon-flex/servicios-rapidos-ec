@@ -114,7 +114,7 @@ export default async function LeadDetallePage({
                   <p className="text-xl font-semibold text-gray-900">{lead.service.nombre}</p>
                   <p className="text-sm text-gray-500">{lead.service.descripcion}</p>
                   <p className="text-sm font-medium text-blue-600 mt-1">
-                    Precio base: {formatearMoneda(lead.service.precioBase)} / {lead.service.unidad}
+                    Precio base: {formatearMoneda(lead.service.precioBase.toNumber())} / {lead.service.unidad}
                   </p>
                 </div>
               </div>

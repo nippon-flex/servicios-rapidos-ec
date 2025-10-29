@@ -38,3 +38,30 @@ export async function GET(
     )
   }
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const body = await request.json()
+
+    const quote = await prisma.quote.update({
+      where: { id },
+      data: {
+        estado: body.estado || 'ENVIADA',
+        enviadaEn: body.estado === 'ENVIADA' ? new Date() : undefined,
+        aprobadaEn: body.estado === 'APROBADA' ? new Date() : undefined,
+      },
+    })
+
+    return NextResponse.json(quote)
+  } catch (error) {
+    console.error('Error actualizando cotización:', error)
+    return NextResponse.json(
+      { error: 'Error al actualizar' },
+      { status: 500 }
+    )
+  }
+}
