@@ -1,6 +1,26 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export async function GET() {
+  try {
+    const cotizaciones = await prisma.quote.findMany({
+      include: {
+        lead: {
+          include: {
+            service: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    return NextResponse.json(cotizaciones)
+  } catch (error) {
+    console.error('Error al obtener cotizaciones:', error)
+    return NextResponse.json({ error: 'Error al obtener cotizaciones' }, { status: 500 })
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
