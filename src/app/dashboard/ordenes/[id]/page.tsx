@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import RegistrarPagoButton from './RegistrarPagoButton'
 import AsignarMaestroButton from './AsignarMaestroButton'
+import GestionFotos from './GestionFotos'
 
 export default async function OrdenDetallePage({
   params,
@@ -40,7 +41,6 @@ export default async function OrdenDetallePage({
     notFound()
   }
 
-  // Calcular totales de pagos
   const totalPagado = orden.pagos.reduce((sum, p) => sum + Number(p.monto), 0)
   const totalOrden = Number(orden.quote.total)
   const anticipo = Number(orden.quote.anticipo)
@@ -201,6 +201,14 @@ export default async function OrdenDetallePage({
                 </div>
               )}
             </div>
+
+            {/* FOTOS */}
+            <GestionFotos
+              ordenId={orden.id}
+              fotosAntes={orden.fotosAntes}
+              fotosDurante={orden.fotosDurante}
+              fotosDespues={orden.fotosDespues}
+            />
           </div>
 
           {/* COLUMNA LATERAL */}
@@ -249,11 +257,12 @@ export default async function OrdenDetallePage({
               
               <div className="space-y-3">
                 {/* Asignar Maestro */}
-<AsignarMaestroButton
-  ordenId={orden.id}
-  maestroActual={orden.maestro}
-/>
-                {/* Botón Registrar Anticipo */}
+                <AsignarMaestroButton
+                  ordenId={orden.id}
+                  maestroActual={orden.maestro}
+                />
+
+                {/* Botón Aprobar Cotización */}
                 {orden.estado === 'ANTICIPO_PENDIENTE' && (
                   <RegistrarPagoButton
                     ordenId={orden.id}
