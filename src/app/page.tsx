@@ -129,7 +129,7 @@ export default function HomePage() {
             Cotización gratis en minutos. Garantía de 90 días.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6">
+            <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
               <Link href="/solicitar">
                 📋 Solicitar Servicio
               </Link>
@@ -139,7 +139,7 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-transparent text-white border-white hover:bg-white hover:text-blue-600">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-6">
                 💬 WhatsApp Directo
               </Button>
             </a>
