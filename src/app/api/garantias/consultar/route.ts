@@ -17,10 +17,14 @@ export async function POST(request: Request) {
           include: {
             quote: {
               include: {
-                service: {
-                  select: {
-                    nombre: true,
-                    icono: true,
+                lead: {
+                  include: {
+                    service: {
+                      select: {
+                        nombre: true,
+                        icono: true,
+                      },
+                    },
                   },
                 },
               },
