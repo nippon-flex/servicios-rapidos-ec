@@ -1,167 +1,176 @@
-import { prisma } from '@/lib/prisma'
-import { formatearMoneda } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { prisma } from '@/lib/prisma';
+import { formatearMoneda } from '@/lib/utils';
+import Link from 'next/link';
 
-export default async function ServiciosPage() {
-  // Obtener la región de Quito
+export default async function ServiciosPublicosPage() {
+  // Obtener región de Quito
   const region = await prisma.region.findFirst({
     where: {
       ciudad: 'Quito',
       pais: 'Ecuador',
     },
-  })
+  });
 
-  if (!region) {
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold text-red-600">
-          Error: No se encontró la región de Quito
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Asegúrate de haber ejecutado el seed: <code>npm run seed</code>
-        </p>
-      </div>
-    )
-  }
-
-  // Obtener todos los servicios
+  // Obtener servicios activos
   const servicios = await prisma.service.findMany({
     where: {
-      regionId: region.id,
+      regionId: region?.id,
+      activo: true,
     },
     orderBy: {
       orden: 'asc',
     },
-  })
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                📋 Servicios - Quito
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Gestiona el catálogo de servicios disponibles
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              🏠 Servicios Rápidos EC
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-8">
+              Soluciones profesionales para tu hogar en Quito
+            </p>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <a
+                href="https://wa.me/593987531450?text=Hola,%20necesito%20información%20sobre%20sus%20servicios"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg flex items-center gap-2"
+              >
+                📱 WhatsApp
+              </a>
+              <Link
+                href="/"
+                className="bg-white/10 backdrop-blur-sm border-2 border-white/50 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all hover:scale-105"
+              >
+                ← Volver al Inicio
+              </Link>
             </div>
-            <Button asChild>
-              <Link href="/dashboard">← Volver al Dashboard</Link>
-            </Button>
           </div>
         </div>
       </div>
 
-      {/* Contenido */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Estadísticas rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-500">Total de servicios</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">
-              {servicios.length}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-500">Servicios activos</div>
-            <div className="text-3xl font-bold text-green-600 mt-2">
-              {servicios.filter(s => s.activo).length}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-500">Precio promedio</div>
-            <div className="text-3xl font-bold text-blue-600 mt-2">
-              {formatearMoneda(
-                servicios.reduce((sum, s) => sum + s.precioBase.toNumber(), 0) / servicios.length
-              )}
-            </div>
-          </div>
+      {/* Servicios */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Nuestros Servicios
+          </h2>
+          <p className="text-lg text-gray-600">
+            Profesionales calificados para cada necesidad de tu hogar
+          </p>
         </div>
 
-        {/* Tabla de servicios */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Servicio
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Precio Base
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Unidad
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {servicios.map((servicio) => (
-                <tr key={servicio.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="text-2xl mr-3">{servicio.icono}</div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {servicio.nombre}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {servicio.descripcion.substring(0, 50)}...
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {formatearMoneda(servicio.precioBase.toNumber())}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {servicio.unidad}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {servicio.activo ? (
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Activo
-                      </span>
-                    ) : (
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                        Inactivo
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-3">
-                      Editar
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {servicios.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-500">No hay servicios registrados</p>
-            <Button className="mt-4">+ Agregar primer servicio</Button>
+        {servicios.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 text-lg">No hay servicios disponibles en este momento.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {servicios.map((servicio) => (
+              <div
+                key={servicio.id}
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6 border border-gray-100"
+              >
+                {/* Icono */}
+                <div className="text-5xl mb-4">{servicio.icono}</div>
+                
+                {/* Nombre */}
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {servicio.nombre}
+                </h3>
+                
+                {/* Descripción */}
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {servicio.descripcion}
+                </p>
+                
+                {/* Precio */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <span className="text-sm text-gray-500">Desde</span>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {formatearMoneda(Number(servicio.precioBase))}
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    por {servicio.unidad}
+                  </span>
+                </div>
+                
+                {/* Botón */}
+<Link
+  href={`/solicitar?servicio=${servicio.slug}`}
+  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-lg font-semibold transition-all hover:scale-105"
+>
+  📝 Solicitar Servicio
+</Link>
+              </div>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Beneficios */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl mb-4">✅</div>
+              <h3 className="text-lg font-semibold mb-2">Profesionales Calificados</h3>
+              <p className="text-gray-600 text-sm">
+                Maestros verificados y con experiencia comprobada
+              </p>
+            </div>
+            <div>
+              <div className="text-4xl mb-4">🛡️</div>
+              <h3 className="text-lg font-semibold mb-2">Garantía de 90 Días</h3>
+              <p className="text-gray-600 text-sm">
+                Respaldamos nuestro trabajo con garantía extendida
+              </p>
+            </div>
+            <div>
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="text-lg font-semibold mb-2">Respuesta Rápida</h3>
+              <p className="text-gray-600 text-sm">
+                Cotización en menos de 24 horas hábiles
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Final */}
+      <div className="bg-blue-600 text-white py-16">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-3xl font-bold mb-4">
+            ¿Listo para comenzar?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Solicita tu cotización gratuita en menos de 2 minutos
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://wa.me/593987531450?text=Hola,%20necesito%20información%20sobre%20sus%20servicios"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg"
+            >
+              📱 Contactar por WhatsApp
+            </a>
+            <Link
+              href="/"
+              className="border-2 border-white text-white hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold text-lg transition-all hover:scale-105"
+            >
+              ← Volver al Inicio
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }

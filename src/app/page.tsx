@@ -10,70 +10,104 @@ export default function Home() {
             <span className="text-2xl">⚡</span>
             <span className="text-xl font-bold text-gray-900">Servicios Rápidos EC</span>
           </div>
-          <a
-            href="https://wa.me/593987531450?text=Hola,%20necesito%20un%20servicio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2"
-          >
-            <span>📱</span>
-            WhatsApp
-          </a>
+          
+          {/* Botones de acción */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/servicios"
+              className="hidden md:inline-flex items-center gap-2 text-gray-700 hover:text-blue-600 font-semibold transition-all"
+            >
+              📋 Servicios
+            </Link>
+            
+            <Link
+              href="/dashboard"
+              className="hidden sm:inline-flex items-center gap-2 border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-5 py-2 rounded-lg font-semibold transition-all"
+            >
+              <span>🔐</span>
+              Acceder a la App
+            </Link>
+            
+            <a
+              href="https://wa.me/593987531450?text=Hola,%20necesito%20un%20servicio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2"
+            >
+              <span>📱</span>
+              <span className="hidden sm:inline">WhatsApp</span>
+              <span className="sm:hidden">Contacto</span>
+            </a>
+          </div>
         </div>
       </header>
 
       {/* HERO SECTION */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto text-center animate-fade-in">
-          {/* Badge de Urgencia */}
-          <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-full mb-6 animate-pulse">
-            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-            <span className="text-sm font-semibold">Disponible 24/7 en Quito</span>
-          </div>
+      <section className="relative min-h-[600px] md:min-h-[700px] flex items-center">
+        {/* Imagen de Fondo */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=2069&auto=format&fit=crop"
+            alt="Profesional trabajando"
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay oscuro para legibilidad */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-black/50"></div>
+        </div>
 
-          {/* Título Principal */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            El Único Servicio en Quito<br />que Te Garantiza:
-          </h1>
-
-          {/* Beneficios Principales */}
-          <div className="space-y-4 mb-10">
-            <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-gray-700">
-              <span className="text-green-600 text-2xl">✅</span>
-              <span className="font-semibold">Precio justo y claro desde el inicio</span>
+        {/* Contenido */}
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+          <div className="max-w-4xl mx-auto text-center animate-fade-in">
+            {/* Badge de Urgencia */}
+            <div className="inline-flex items-center gap-2 bg-green-500/90 backdrop-blur-sm border border-green-300 text-white px-4 py-2 rounded-full mb-6 animate-pulse shadow-lg">
+              <span className="w-2 h-2 bg-white rounded-full"></span>
+              <span className="text-sm font-semibold">Disponible 24/7 en Quito</span>
             </div>
-            <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-gray-700">
-              <span className="text-green-600 text-2xl">✅</span>
-              <span className="font-semibold">Maestro verificado con cédula</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-gray-700">
-              <span className="text-green-600 text-2xl">✅</span>
-              <span className="font-semibold">Si no queda bien, volvemos GRATIS</span>
-            </div>
-          </div>
 
-          {/* CTAs Principales */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <a
-              href="https://wa.me/593987531450?text=Hola,%20necesito%20un%20servicio%20urgente"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto"
-            >
-              🚨 Solicitar Servicio Ahora
-            </a>
-            <Link
-              href="/dashboard"
-              className="border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all w-full sm:w-auto"
-            >
-              📊 Dashboard
-            </Link>
-          </div>
+            {/* Título Principal */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+              El Único Servicio en Quito<br />que Te Garantiza:
+            </h1>
 
-          {/* Prueba Social */}
-          <p className="text-gray-600 text-sm">
-            ⭐⭐⭐⭐⭐ <span className="font-semibold">+500 servicios realizados</span> en Quito
-          </p>
+            {/* Beneficios Principales */}
+            <div className="space-y-4 mb-10">
+              <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-white">
+                <span className="text-green-400 text-2xl">✅</span>
+                <span className="font-semibold drop-shadow">Precio justo y claro desde el inicio</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-white">
+                <span className="text-green-400 text-2xl">✅</span>
+                <span className="font-semibold drop-shadow">Maestro verificado con cédula</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-lg md:text-xl text-white">
+                <span className="text-green-400 text-2xl">✅</span>
+                <span className="font-semibold drop-shadow">Si no queda bien, volvemos GRATIS</span>
+              </div>
+            </div>
+
+            {/* CTAs Principales */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <a
+                href="https://wa.me/593987531450?text=Hola,%20necesito%20un%20servicio%20urgente"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-2xl w-full sm:w-auto border-2 border-blue-400"
+              >
+                🚨 Solicitar Servicio Ahora
+              </a>
+              <Link
+                href="/servicios"
+                className="bg-white/10 backdrop-blur-sm border-2 border-white/50 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all hover:scale-105 shadow-2xl w-full sm:w-auto"
+              >
+                📋 Ver Todos los Servicios
+              </Link>
+            </div>
+
+            {/* Prueba Social */}
+            <p className="text-white/90 text-sm drop-shadow">
+              ⭐⭐⭐⭐⭐ <span className="font-semibold">+500 servicios realizados</span> en Quito
+            </p>
+          </div>
         </div>
       </section>
 
@@ -160,39 +194,189 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICIOS */}
-      <section className="bg-white py-16 border-y">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+      {/* SERVICIOS - CARRUSEL */}
+      <section className="bg-white py-16 border-y overflow-hidden">
+        <div className="container mx-auto px-4 mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
             Nuestros Servicios
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {/* Servicio 1 */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl hover:shadow-lg transition-all hover:scale-105">
-              <div className="text-4xl mb-3">🔧</div>
-              <h3 className="font-bold text-lg mb-2 text-gray-900">Plomería</h3>
-              <p className="text-gray-700 text-sm">Fugas, instalaciones, destapes y reparaciones</p>
+          <p className="text-center text-gray-600 max-w-2xl mx-auto mb-6">
+            Profesionales verificados para cada necesidad de tu hogar o negocio
+          </p>
+          {/* Botón Ver Todos */}
+          <div className="text-center">
+            <Link
+              href="/servicios"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
+            >
+              📋 Ver Catálogo Completo de Servicios
+            </Link>
+          </div>
+        </div>
+
+        {/* Carrusel Infinito */}
+        <div className="relative">
+          <div className="flex animate-scroll-services">
+            {/* Primera serie de servicios */}
+            <div className="flex gap-6 px-3">
+              {/* Plomería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔧</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Plomería</h3>
+                <p className="text-gray-700 text-sm">Fugas, instalaciones, destapes, reparaciones y mantenimiento</p>
+              </div>
+
+              {/* Electricidad */}
+              <div className="min-w-[280px] bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">⚡</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Electricidad</h3>
+                <p className="text-gray-700 text-sm">Instalaciones eléctricas, reparaciones y mantenimiento preventivo</p>
+              </div>
+
+              {/* Construcción */}
+              <div className="min-w-[280px] bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔨</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Construcción</h3>
+                <p className="text-gray-700 text-sm">Remodelaciones, obra gris, acabados y ampliaciones</p>
+              </div>
+
+              {/* Pintura */}
+              <div className="min-w-[280px] bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🎨</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Pintura</h3>
+                <p className="text-gray-700 text-sm">Interior, exterior, decorativa y acabados especiales</p>
+              </div>
+
+              {/* Cerrajería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔐</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Cerrajería</h3>
+                <p className="text-gray-700 text-sm">Apertura de puertas, cambio de chapas y duplicado de llaves</p>
+              </div>
+
+              {/* Carpintería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🪚</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Carpintería</h3>
+                <p className="text-gray-700 text-sm">Muebles a medida, puertas, closets y reparaciones</p>
+              </div>
+
+              {/* Limpieza */}
+              <div className="min-w-[280px] bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🧹</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Limpieza</h3>
+                <p className="text-gray-700 text-sm">Limpieza profunda, post-construcción y mantenimiento</p>
+              </div>
+
+              {/* Jardinería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🌱</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Jardinería</h3>
+                <p className="text-gray-700 text-sm">Diseño, mantenimiento, poda y sistemas de riego</p>
+              </div>
+
+              {/* Aire Acondicionado */}
+              <div className="min-w-[280px] bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">❄️</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Aire Acondicionado</h3>
+                <p className="text-gray-700 text-sm">Instalación, mantenimiento y reparación de equipos</p>
+              </div>
+
+              {/* Albañilería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-stone-50 to-stone-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🧱</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Albañilería</h3>
+                <p className="text-gray-700 text-sm">Muros, pisos, contrapisos y trabajos en concreto</p>
+              </div>
+
+              {/* Vidriería */}
+              <div className="min-w-[280px] bg-gradient-to-br from-sky-50 to-sky-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🪟</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Vidriería</h3>
+                <p className="text-gray-700 text-sm">Instalación de ventanas, espejos y trabajos en vidrio</p>
+              </div>
+
+              {/* Fumigación */}
+              <div className="min-w-[280px] bg-gradient-to-br from-lime-50 to-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🦟</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Fumigación</h3>
+                <p className="text-gray-700 text-sm">Control de plagas residencial y comercial</p>
+              </div>
             </div>
 
-            {/* Servicio 2 */}
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl hover:shadow-lg transition-all hover:scale-105">
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="font-bold text-lg mb-2 text-gray-900">Electricidad</h3>
-              <p className="text-gray-700 text-sm">Instalaciones, reparaciones y mantenimiento</p>
-            </div>
+            {/* Segunda serie (duplicado para loop infinito) */}
+            <div className="flex gap-6 px-3" aria-hidden="true">
+              <div className="min-w-[280px] bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔧</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Plomería</h3>
+                <p className="text-gray-700 text-sm">Fugas, instalaciones, destapes, reparaciones y mantenimiento</p>
+              </div>
 
-            {/* Servicio 3 */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl hover:shadow-lg transition-all hover:scale-105">
-              <div className="text-4xl mb-3">🔨</div>
-              <h3 className="font-bold text-lg mb-2 text-gray-900">Construcción</h3>
-              <p className="text-gray-700 text-sm">Remodelaciones, obra gris y acabados</p>
-            </div>
+              <div className="min-w-[280px] bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">⚡</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Electricidad</h3>
+                <p className="text-gray-700 text-sm">Instalaciones eléctricas, reparaciones y mantenimiento preventivo</p>
+              </div>
 
-            {/* Servicio 4 */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl hover:shadow-lg transition-all hover:scale-105">
-              <div className="text-4xl mb-3">🎨</div>
-              <h3 className="font-bold text-lg mb-2 text-gray-900">Pintura</h3>
-              <p className="text-gray-700 text-sm">Interior, exterior y acabados especiales</p>
+              <div className="min-w-[280px] bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔨</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Construcción</h3>
+                <p className="text-gray-700 text-sm">Remodelaciones, obra gris, acabados y ampliaciones</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🎨</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Pintura</h3>
+                <p className="text-gray-700 text-sm">Interior, exterior, decorativa y acabados especiales</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🔐</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Cerrajería</h3>
+                <p className="text-gray-700 text-sm">Apertura de puertas, cambio de chapas y duplicado de llaves</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🪚</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Carpintería</h3>
+                <p className="text-gray-700 text-sm">Muebles a medida, puertas, closets y reparaciones</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🧹</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Limpieza</h3>
+                <p className="text-gray-700 text-sm">Limpieza profunda, post-construcción y mantenimiento</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🌱</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Jardinería</h3>
+                <p className="text-gray-700 text-sm">Diseño, mantenimiento, poda y sistemas de riego</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">❄️</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Aire Acondicionado</h3>
+                <p className="text-gray-700 text-sm">Instalación, mantenimiento y reparación de equipos</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-stone-50 to-stone-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🧱</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Albañilería</h3>
+                <p className="text-gray-700 text-sm">Muros, pisos, contrapisos y trabajos en concreto</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-sky-50 to-sky-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🪟</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Vidriería</h3>
+                <p className="text-gray-700 text-sm">Instalación de ventanas, espejos y trabajos en vidrio</p>
+              </div>
+
+              <div className="min-w-[280px] bg-gradient-to-br from-lime-50 to-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div className="text-5xl mb-3">🦟</div>
+                <h3 className="font-bold text-lg mb-2 text-gray-900">Fumigación</h3>
+                <p className="text-gray-700 text-sm">Control de plagas residencial y comercial</p>
+              </div>
             </div>
           </div>
         </div>
@@ -269,16 +453,25 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             No esperes a que empeore. Contáctanos ahora y recibe una cotización en minutos.
           </p>
-          <a
-            href="https://wa.me/593987531450?text=Hola,%20quiero%20solicitar%20un%20servicio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-10 py-5 rounded-lg font-bold text-xl transition-all hover:scale-105 shadow-xl"
-          >
-            <span className="text-3xl">📱</span>
-            Contactar por WhatsApp
-          </a>
-          <p className="text-gray-500 text-sm mt-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+            <a
+              href="https://wa.me/593987531450?text=Hola,%20quiero%20solicitar%20un%20servicio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-10 py-5 rounded-lg font-bold text-xl transition-all hover:scale-105 shadow-xl"
+            >
+              <span className="text-3xl">📱</span>
+              Contactar por WhatsApp
+            </a>
+            <Link
+              href="/servicios"
+              className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-lg font-bold text-xl transition-all hover:scale-105 shadow-xl"
+            >
+              <span className="text-3xl">📋</span>
+              Ver Todos los Servicios
+            </Link>
+          </div>
+          <p className="text-gray-500 text-sm">
             Respuesta inmediata • Cotización gratis • Sin compromiso
           </p>
         </div>

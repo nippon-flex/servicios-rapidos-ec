@@ -35,17 +35,17 @@ export default function SolicitarContent() {
   })
 
   useEffect(() => {
-    fetch('/api/servicios')
-      .then((res) => res.json())
-      .then((data) => {
-        setServicios(data.services || [])
-        if (servicioPreseleccionado) {
-          setFormData((prev) => ({ ...prev, serviceId: servicioPreseleccionado }))
-        }
-      })
-      .catch((err) => console.error('Error cargando servicios:', err))
-      .finally(() => setLoading(false))
-  }, [servicioPreseleccionado])
+  fetch('/api/servicios')
+    .then((res) => res.json())
+    .then((data) => {
+      setServicios(data || [])  // ✅ La API devuelve array directo, no { services: [] }
+      if (servicioPreseleccionado) {
+        setFormData((prev) => ({ ...prev, serviceId: servicioPreseleccionado }))
+      }
+    })
+    .catch((err) => console.error('Error cargando servicios:', err))
+    .finally(() => setLoading(false))
+}, [servicioPreseleccionado])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

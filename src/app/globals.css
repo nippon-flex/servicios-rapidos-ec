@@ -79,3 +79,22 @@
 .animate-fade-in {
   animation: fade-in 0.8s ease-out;
 }
+
+/* Carrusel infinito de servicios */
+
+@keyframes scroll-services {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-services {
+animation: scroll-services 20s linear infinite;
+}
+
+.animate-scroll-services:hover {
+  animation-play-state: paused;
+}
