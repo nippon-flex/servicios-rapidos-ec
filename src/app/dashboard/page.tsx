@@ -16,6 +16,10 @@ export default async function DashboardPage() {
     totalCotizaciones,
     totalOrdenes,
     totalServicios,
+    totalGarantias,
+    totalMaestros,
+    totalPagosClientes,
+    totalPagosMaestros,
   ] = await Promise.all([
     prisma.lead.count(),
     prisma.quote.count(),
@@ -23,7 +27,15 @@ export default async function DashboardPage() {
     prisma.service.count({
       where: { activo: true }
     }),
+    prisma.warrantyCase.count(),
+    prisma.user.count({
+      where: { rol: 'MAESTRO' }
+    }),
+    prisma.payment.count(),
+    prisma.maestroPago.count(),
   ])
+
+  const totalPagos = totalPagosClientes + totalPagosMaestros
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -107,15 +119,100 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {/* Segunda fila de tarjetas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Garantías */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Garantías</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalGarantias}</p>
+              </div>
+              <div className="text-4xl">🛡️</div>
+            </div>
+            <Link href="/dashboard/garantias" className="text-sm text-orange-600 hover:underline mt-4 inline-block">
+              Gestionar →
+            </Link>
+          </div>
+
+          {/* Maestros */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Maestros</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalMaestros}</p>
+              </div>
+              <div className="text-4xl">👷</div>
+            </div>
+            <Link href="/dashboard/maestros" className="text-sm text-indigo-600 hover:underline mt-4 inline-block">
+              Gestionar →
+            </Link>
+          </div>
+
+          {/* Pagos */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-emerald-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Pagos</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{totalPagos}</p>
+              </div>
+              <div className="text-4xl">💰</div>
+            </div>
+            <Link href="/dashboard/pagos" className="text-sm text-emerald-600 hover:underline mt-4 inline-block">
+              Ver todos →
+            </Link>
+          </div>
+        </div>
+
+        {/* Enlaces rápidos */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔗 Enlaces Rápidos</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a
+              href="/solicitar"
+              target="_blank"
+              className="text-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              <div className="text-3xl mb-2">📝</div>
+              <div className="text-sm font-medium text-gray-900">Formulario Clientes</div>
+            </a>
+            <a
+              href="/servicios"
+              target="_blank"
+              className="text-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+              <div className="text-3xl mb-2">🛠️</div>
+              <div className="text-sm font-medium text-gray-900">Catálogo Público</div>
+            </a>
+            <a
+              href="/garantia"
+              target="_blank"
+              className="text-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+            >
+              <div className="text-3xl mb-2">🛡️</div>
+              <div className="text-sm font-medium text-gray-900">Consultar Garantía</div>
+            </a>
+            <a
+              href="/"
+              target="_blank"
+              className="text-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <div className="text-3xl mb-2">🏠</div>
+              <div className="text-sm font-medium text-gray-900">Landing Page</div>
+            </a>
+          </div>
+        </div>
+
         {/* Próximamente */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Próximas funcionalidades</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Funcionalidades del Sistema</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✅ Gestión de servicios - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Sistema de cotizaciones con IA - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Gestión de órdenes de trabajo - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Panel de maestros - <span className="text-green-600 font-semibold">Completado</span></li>
-            <li>🔄 Sistema de garantías</li>
+            <li>✅ Sistema de garantías - <span className="text-green-600 font-semibold">Completado</span></li>
+            <li>✅ Gestión de pagos - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>🔄 Reportes y métricas</li>
           </ul>
         </div>

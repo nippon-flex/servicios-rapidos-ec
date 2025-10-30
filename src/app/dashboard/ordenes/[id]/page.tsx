@@ -1,3 +1,4 @@
+
 import { prisma } from '@/lib/prisma'
 import { formatearFecha, formatearMoneda } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -6,6 +7,7 @@ import { notFound } from 'next/navigation'
 import RegistrarPagoButton from './RegistrarPagoButton'
 import AsignarMaestroButton from './AsignarMaestroButton'
 import GestionFotos from './GestionFotos'
+import RegistrarGarantiaForm from './RegistrarGarantiaForm'
 
 export default async function OrdenDetallePage({
   params,
@@ -84,10 +86,10 @@ export default async function OrdenDetallePage({
       {/* CONTENIDO */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
+
           {/* COLUMNA PRINCIPAL */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* DATOS DEL CLIENTE */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">👤 Cliente</h2>
@@ -213,7 +215,6 @@ export default async function OrdenDetallePage({
 
           {/* COLUMNA LATERAL */}
           <div className="space-y-6">
-            
             {/* RESUMEN FINANCIERO */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">💰 Resumen</h3>
@@ -251,17 +252,15 @@ export default async function OrdenDetallePage({
               </div>
             </div>
 
-            {/* BOTONES DE ACCIÓN */}
+            {/* BOTONES DE ACCIÓN - GARANTÍA INTEGRADA */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">⚡ Acciones</h3>
-              
               <div className="space-y-3">
                 {/* Asignar Maestro */}
                 <AsignarMaestroButton
-  ordenId={orden.id}
-  maestroActual={orden.maestro}
-  onAsignado={() => window.location.reload()}
-/>
+                  ordenId={orden.id}
+                  maestroActual={orden.maestro}
+                />
 
                 {/* Botón Aprobar Cotización */}
                 {orden.estado === 'ANTICIPO_PENDIENTE' && (
@@ -281,21 +280,27 @@ export default async function OrdenDetallePage({
                   />
                 )}
 
-                {/* Info si está cerrada */}
+                {/* Info si está cerrada + Formulario Garantía */}
                 {orden.estado === 'CERRADA' && (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-                    <div className="text-2xl mb-2">✅</div>
-                    <p className="text-sm font-semibold text-green-800">
-                      Orden Completada y Pagada
-                    </p>
-                  </div>
+                  <>
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center mb-4">
+                      <div className="text-2xl mb-2">✅</div>
+                      <p className="text-sm font-semibold text-green-800">
+                        Orden Completada y Pagada
+                      </p>
+                    </div>
+                    {/* IMPORTANTE: Aquí aparece el formulario garantía */}
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-2">
+                      <h4 className="text-base font-semibold text-yellow-800 mb-3">🛡️ Registrar Garantía</h4>
+                      <RegistrarGarantiaForm orderId={orden.id} />
+                    </div>
+                  </>
                 )}
 
                 {/* Botón WhatsApp */}
                 <a
                   href={`https://wa.me/${orden.quote.lead.clienteTelefono.replace(
-                    /[^0-9]/g,
-                    ''
+                    /[^0-9]/g, ''
                   )}?text=${encodeURIComponent(
                     `Hola ${orden.quote.lead.clienteNombre}, sobre la orden ${orden.codigo}...`
                   )}`}

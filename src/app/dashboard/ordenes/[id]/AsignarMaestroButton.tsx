@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
 type Maestro = {
@@ -14,12 +15,11 @@ type Maestro = {
 export default function AsignarMaestroButton({
   ordenId,
   maestroActual,
-  onAsignado,
 }: {
   ordenId: string
   maestroActual?: { id: string; nombre: string } | null
-  onAsignado: () => void
 }) {
+  const router = useRouter()
   const [maestros, setMaestros] = useState<Maestro[]>([])
   const [mostrar, setMostrar] = useState(false)
   const [asignando, setAsignando] = useState(false)
@@ -45,7 +45,7 @@ export default function AsignarMaestroButton({
         body: JSON.stringify({ maestroId }),
       })
       if (res.ok) {
-        onAsignado()
+        router.refresh() // Recargar datos del servidor
         setMostrar(false)
       }
     } catch (error) {
@@ -64,7 +64,7 @@ export default function AsignarMaestroButton({
         body: JSON.stringify({ maestroId: null }),
       })
       if (res.ok) {
-        onAsignado()
+        router.refresh() // Recargar datos del servidor
       }
     } catch (error) {
       console.error('Error removiendo maestro:', error)
