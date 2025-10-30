@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
@@ -108,36 +107,14 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Acciones rápidas */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">🚀 Acciones Rápidas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button asChild size="lg" className="w-full">
-              <Link href="/dashboard/servicios">
-                📋 Gestionar Servicios
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="w-full">
-              <Link href="/solicitar">
-                📝 Nueva Solicitud (Vista Cliente)
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="w-full">
-              <Link href="/dashboard/test-ai">
-                🤖 Probar IA
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         {/* Próximamente */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Próximas funcionalidades</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✅ Gestión de servicios - <span className="text-green-600 font-semibold">Completado</span></li>
-            <li>🔄 Sistema de cotizaciones con IA</li>
-            <li>🔄 Gestión de órdenes de trabajo</li>
-            <li>🔄 Panel de maestros</li>
+            <li>✅ Sistema de cotizaciones con IA - <span className="text-green-600 font-semibold">Completado</span></li>
+            <li>✅ Gestión de órdenes de trabajo - <span className="text-green-600 font-semibold">Completado</span></li>
+            <li>✅ Panel de maestros - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>🔄 Sistema de garantías</li>
             <li>🔄 Reportes y métricas</li>
           </ul>
