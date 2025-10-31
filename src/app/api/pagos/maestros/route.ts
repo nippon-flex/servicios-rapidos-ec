@@ -19,11 +19,6 @@ export async function GET() {
             email: true,
           },
         },
-        order: {
-          select: {
-            codigo: true,
-          },
-        },
       },
       orderBy: {
         fecha: 'desc',
