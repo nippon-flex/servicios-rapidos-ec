@@ -43,13 +43,13 @@ export default async function LeadDetallePage({
                 <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                   lead.estado === 'NUEVO' ? 'bg-green-100 text-green-800' :
                   lead.estado === 'CONTACTADO' ? 'bg-blue-100 text-blue-800' :
-                  lead.estado === 'COTIZANDO' ? 'bg-yellow-100 text-yellow-800' :
+                  lead.estado === 'COTIZADO' ? 'bg-yellow-100 text-yellow-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>
                   {lead.estado}
                 </span>
                 {/* Badge urgente */}
-                {lead.urgente && (
+                {lead.urgencia === 'urgente' && (
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                     🚨 URGENTE
                   </span>
@@ -96,9 +96,6 @@ export default async function LeadDetallePage({
                 <div>
                   <label className="text-sm font-medium text-gray-500">Dirección</label>
                   <p className="text-base text-gray-900">{lead.direccion}</p>
-                  {lead.referencia && (
-                    <p className="text-sm text-gray-500 mt-1">📍 {lead.referencia}</p>
-                  )}
                 </div>
               </div>
             </div>
@@ -174,23 +171,23 @@ export default async function LeadDetallePage({
 
                 {/* Botón Crear Cotización */}
                 {lead.cotizaciones.length === 0 ? (
-  <Button asChild className="w-full" size="lg">
-    <Link href={`/dashboard/cotizaciones/nueva?leadId=${lead.id}`}>
-      📋 Crear Cotización
-    </Link>
-  </Button>
-) : (
-  <div className="space-y-2">
-    <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-700 text-center">
-      ✅ Ya tiene {lead.cotizaciones.length} cotización(es)
-    </div>
-    <Button asChild className="w-full" size="lg" variant="outline">
-      <Link href={`/dashboard/cotizaciones/${lead.cotizaciones[0].id}`}>
-        👁️ Ver Cotización
-      </Link>
-    </Button>
-  </div>
-)}
+                  <Button asChild className="w-full" size="lg">
+                    <Link href={`/dashboard/cotizaciones/nueva?leadId=${lead.id}`}>
+                      📋 Crear Cotización
+                    </Link>
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-700 text-center">
+                      ✅ Ya tiene {lead.cotizaciones.length} cotización(es)
+                    </div>
+                    <Button asChild className="w-full" size="lg" variant="outline">
+                      <Link href={`/dashboard/cotizaciones/${lead.cotizaciones[0].id}`}>
+                        👁️ Ver Cotización
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -200,15 +197,19 @@ export default async function LeadDetallePage({
                 ℹ️ Información Adicional
               </h3>
               <div className="space-y-2 text-sm">
+                {lead.region && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Región:</span>
+                    <span className="font-medium text-gray-900">
+                      {lead.region.ciudad}, {lead.region.pais}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Región:</span>
-                  <span className="font-medium text-gray-900">
-                    {lead.region.ciudad}, {lead.region.pais}
+                  <span className="text-gray-500">Urgencia:</span>
+                  <span className={`font-medium ${lead.urgencia === 'urgente' ? 'text-red-600' : 'text-gray-900'}`}>
+                    {lead.urgencia === 'urgente' ? '🚨 Urgente' : 'Normal'}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Fuente:</span>
-                  <span className="font-medium text-gray-900">{lead.fuente || 'web'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">ID:</span>
