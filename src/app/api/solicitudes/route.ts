@@ -13,6 +13,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Obtener organización
+    const organizacion = await prisma.organization.findFirst();
+    
+    if (!organizacion) {
+      return NextResponse.json(
+        { error: 'Organización no encontrada' },
+        { status: 500 }
+      );
+    }
+
     // Obtener región de Quito
     const region = await prisma.region.findFirst({
       where: {
@@ -52,16 +62,15 @@ export async function POST(request: Request) {
     const lead = await prisma.lead.create({
       data: {
         codigo,
+        organizationId: organizacion.id,
         regionId: region.id,
         serviceId: body.serviceId,
         clienteNombre: body.clienteNombre,
         clienteTelefono: body.clienteTelefono,
         clienteEmail: body.clienteEmail || null,
         direccion: body.direccion,
-        referencia: body.referencia || null,
         descripcion: body.descripcion,
-        urgente: body.urgente || false,
-        fuente: 'web',
+        urgencia: body.urgente ? 'urgente' : 'normal',
         estado: 'NUEVO',
         fotos: [],
       },
