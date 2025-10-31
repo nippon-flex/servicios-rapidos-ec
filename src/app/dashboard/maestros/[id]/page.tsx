@@ -108,10 +108,12 @@ export default async function MaestroDetallePage({
                 Información Personal
               </h2>
               <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Teléfono</label>
-                  <p className="text-base text-gray-900">{maestro.telefono}</p>
-                </div>
+                {maestro.telefono && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Teléfono</label>
+                    <p className="text-base text-gray-900">{maestro.telefono}</p>
+                  </div>
+                )}
                 {maestro.ci && (
                   <div>
                     <label className="text-sm font-medium text-gray-500">Cédula</label>
@@ -354,17 +356,19 @@ export default async function MaestroDetallePage({
                 Acciones
               </h3>
               <div className="space-y-3">
-                <a
-                  href={`https://wa.me/${maestro.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                    `Hola ${maestro.nombre}, te contacto sobre las órdenes de trabajo...`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
-                    📱 Contactar por WhatsApp
-                  </Button>
-                </a>
+                {maestro.telefono && (
+                  <a
+                    href={`https://wa.me/${maestro.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                      `Hola ${maestro.nombre}, te contacto sobre las órdenes de trabajo...`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                      📱 Contactar por WhatsApp
+                    </Button>
+                  </a>
+                )}
                 <Button asChild variant="outline" className="w-full">
                   <Link href={`/dashboard/maestros/${maestro.id}/editar`}>
                     ✏️ Editar Información
