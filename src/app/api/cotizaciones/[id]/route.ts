@@ -1,19 +1,60 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
+// Obtener cotización por ID
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await auth.protect()
     const { id } = await params
 
-    const quote = await prisma.quote.findUnique({
+    const cotizacion = await prisma.quote.findUnique({
       where: { id },
       include: {
-        items: {
-          orderBy: { orden: 'asc' },
+        items: true,
+        lead: {
+          include: {
+            service: true,
+          },
         },
+        orden: true,
+      },
+    })
+
+    if (!cotizacion) {
+      return NextResponse.json({ error: 'Cotización no encontrada' }, { status: 404 })
+    }
+
+    return NextResponse.json(cotizacion)
+  } catch (error) {
+    console.error('Error obteniendo cotización:', error)
+    return NextResponse.json(
+      { error: 'Error al obtener cotización' },
+      { status: 500 }
+    )
+  }
+}
+
+// Actualizar cotización
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await auth.protect()
+    const { id } = await params
+    const body = await request.json()
+
+    const cotizacion = await prisma.quote.update({
+      where: { id },
+      data: {
+        estado: body.estado,
+      },
+      include: {
+        items: true,
         lead: {
           include: {
             service: true,
@@ -22,45 +63,42 @@ export async function GET(
       },
     })
 
-    if (!quote) {
-      return NextResponse.json(
-        { error: 'Cotización no encontrada' },
-        { status: 404 }
-      )
+    // Si se aprueba la cotización, actualizar el lead
+    if (body.estado === 'APROBADA') {
+      await prisma.lead.update({
+        where: { id: cotizacion.leadId },
+        data: { estado: 'CONTACTADO' },
+      })
     }
 
-    return NextResponse.json(quote)
+    return NextResponse.json(cotizacion)
   } catch (error) {
-    console.error('Error obteniendo cotización:', error)
+    console.error('Error actualizando cotización:', error)
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error al actualizar cotización' },
       { status: 500 }
     )
   }
 }
 
-export async function PATCH(
+// Eliminar cotización
+export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await auth.protect()
     const { id } = await params
-    const body = await request.json()
 
-    const quote = await prisma.quote.update({
+    await prisma.quote.delete({
       where: { id },
-      data: {
-        estado: body.estado || 'ENVIADA',
-        enviadaEn: body.estado === 'ENVIADA' ? new Date() : undefined,
-        aprobadaEn: body.estado === 'APROBADA' ? new Date() : undefined,
-      },
     })
 
-    return NextResponse.json(quote)
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error actualizando cotización:', error)
+    console.error('Error eliminando cotización:', error)
     return NextResponse.json(
-      { error: 'Error al actualizar' },
+      { error: 'Error al eliminar cotización' },
       { status: 500 }
     )
   }
