@@ -16,11 +16,8 @@ export default async function MaestrosPagosPage() {
         where: {
           estado: 'CERRADA',
         },
-        include: {
-          pagosMaestro: true,
-        },
       },
-      pagosRecibidos: true,
+      pagos: true, // Relación correcta: User tiene "pagos: MaestroPago[]"
     },
     orderBy: {
       nombre: 'asc',
@@ -34,7 +31,7 @@ export default async function MaestrosPagosPage() {
       0
     )
 
-    const totalPagado = maestro.pagosRecibidos.reduce(
+    const totalPagado = maestro.pagos.reduce(
       (sum, pago) => sum + Number(pago.monto),
       0
     )
