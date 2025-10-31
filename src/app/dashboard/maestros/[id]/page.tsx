@@ -31,18 +31,7 @@ export default async function MaestroDetallePage({
           createdAt: 'desc',
         },
       },
-      pagosRecibidos: {
-        include: {
-          order: {
-            include: {
-              quote: {
-                include: {
-                  lead: true,
-                },
-              },
-            },
-          },
-        },
+      pagos: {
         orderBy: {
           createdAt: 'desc',
         },
@@ -66,7 +55,7 @@ export default async function MaestroDetallePage({
     .filter((o) => o.estado === 'CERRADA')
     .reduce((sum, o) => sum + Number(o.costoMaestro), 0)
 
-  const totalPagado = maestro.pagosRecibidos.reduce(
+  const totalPagado = maestro.pagos.reduce(
     (sum, p) => sum + Number(p.monto),
     0
   )
@@ -163,14 +152,14 @@ export default async function MaestroDetallePage({
                 💰 Historial de Pagos Recibidos
               </h2>
               
-              {maestro.pagosRecibidos.length === 0 ? (
+              {maestro.pagos.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <div className="text-4xl mb-2">💸</div>
                   <p>No hay pagos registrados</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {maestro.pagosRecibidos.map((pago) => (
+                  {maestro.pagos.map((pago) => (
                     <div
                       key={pago.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
@@ -189,9 +178,9 @@ export default async function MaestroDetallePage({
                             Ref: {pago.referencia}
                           </div>
                         )}
-                        {pago.order && (
+                        {pago.notas && (
                           <div className="mt-1 text-xs text-gray-500">
-                            Orden: {pago.order.codigo} - {pago.order.quote.lead.clienteNombre}
+                            {pago.notas}
                           </div>
                         )}
                       </div>
