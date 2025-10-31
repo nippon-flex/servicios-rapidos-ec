@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       if (!serviciosCount[servicioId]) {
         serviciosCount[servicioId] = {
           nombre: lead.service.nombre,
-          icono: lead.service.icono,
+          icono: lead.service.icono || '🛠️',
           count: 0,
         };
       }
