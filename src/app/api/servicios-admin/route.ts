@@ -25,26 +25,15 @@ export async function POST(request: Request) {
     
     const body = await request.json();
     
-    // Obtener región de Quito
-    const region = await prisma.region.findFirst({
-      where: { ciudad: 'Quito', pais: 'Ecuador' },
-    });
-    
-    if (!region) {
-      return NextResponse.json({ error: 'Región no encontrada' }, { status: 400 });
-    }
-    
     const servicio = await prisma.service.create({
       data: {
         nombre: body.nombre,
         descripcion: body.descripcion,
-        icono: body.icono,
+        icono: body.icono || null,
         slug: body.nombre.toLowerCase().replace(/\s+/g, '-'),
-        precioBase: body.precioBase,
-        unidad: body.unidad,
-        activo: body.activo,
-        regionId: region.id,
-        orden: 999,
+        precioBase: body.precioBase || 0,
+        unidad: body.unidad || 'servicio',
+        activo: body.activo !== undefined ? body.activo : true,
       },
     });
     
