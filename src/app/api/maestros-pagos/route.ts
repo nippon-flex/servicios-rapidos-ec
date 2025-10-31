@@ -80,19 +80,6 @@ export async function GET(request: Request) {
       where,
       include: {
         maestro: true,
-        order: {
-          include: {
-            quote: {
-              include: {
-                lead: {
-                  include: {
-                    service: true,
-                  },
-                },
-              },
-            },
-          },
-        },
       },
       orderBy: {
         createdAt: 'desc',
