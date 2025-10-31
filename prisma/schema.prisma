@@ -50,47 +50,6 @@ model Region {
 }
 
 // ============================================
-// CIUDADES (NUEVO)
-// ============================================
-
-model City {
-  id          String   @id @default(cuid())
-  nombre      String   // Quito, Caracas, Lima
-  slug        String   @unique // quito, caracas, lima (para URLs)
-  pais        String   // Ecuador, Venezuela, Perú
-  bandera     String?  // 🇪🇨, 🇻🇪, 🇵🇪
-  
-  // Contacto
-  telefono    String
-  whatsapp    String
-  email       String
-  
-  // Áreas de cobertura
-  zonas       String[] // ["La Carolina", "Cumbayá", "Tumbaco"]
-  
-  // Configuración
-  activa      Boolean  @default(true)
-  timezone    String   @default("America/Guayaquil")
-  moneda      String   @default("USD")
-  
-  // SEO
-  metaTitle       String?
-  metaDescription String?
-  
-  // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relaciones
-  leads       Lead[]
-  quotes      Quote[]
-  orders      Order[]
-  maestros    User[]
-  
-  @@map("cities")
-}
-
-// ============================================
 // USUARIOS (MAESTROS Y ADMINS)
 // ============================================
 
@@ -109,7 +68,6 @@ model User {
   rol            RolUsuario  @default(MAESTRO)
   organizationId String
   regionId       String?
-  cityId         String?
   especialidades String[]
   cuentaBanco    String?
   activo         Boolean     @default(true)
@@ -119,7 +77,6 @@ model User {
   // Relaciones
   organization      Organization  @relation(fields: [organizationId], references: [id])
   region            Region?       @relation(fields: [regionId], references: [id])
-  city              City?         @relation(fields: [cityId], references: [id])
   ordenesAsignadas  Order[]
   pagos             MaestroPago[]
 
@@ -165,7 +122,6 @@ model Lead {
   codigo            String      @unique
   organizationId    String
   regionId          String?
-  cityId            String?
   serviceId         String
   clienteNombre     String
   clienteTelefono   String
@@ -182,7 +138,6 @@ model Lead {
   // Relaciones
   organization Organization @relation(fields: [organizationId], references: [id])
   region       Region?      @relation(fields: [regionId], references: [id])
-  city         City?        @relation(fields: [cityId], references: [id])
   service      Service      @relation(fields: [serviceId], references: [id])
   cotizaciones Quote[]
 
@@ -206,7 +161,6 @@ model Quote {
   codigo         String      @unique
   leadId         String
   regionId       String?
-  cityId         String?
   subtotal       Decimal     @default(0) @db.Decimal(10, 2)
   impuesto       Decimal     @default(0) @db.Decimal(10, 2)
   total          Decimal     @default(0) @db.Decimal(10, 2)
@@ -222,7 +176,6 @@ model Quote {
   // Relaciones
   lead         Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
   region       Region?     @relation(fields: [regionId], references: [id])
-  city         City?       @relation(fields: [cityId], references: [id])
   items        QuoteItem[]
   orden        Order?
 
@@ -261,7 +214,6 @@ model Order {
   codigo         String      @unique
   quoteId        String      @unique
   regionId       String?
-  cityId         String?
   maestroId      String?
   costoMaestro   Decimal     @default(0) @db.Decimal(10, 2)
   margen         Decimal     @default(0) @db.Decimal(10, 2)
@@ -278,7 +230,6 @@ model Order {
   // Relaciones
   quote        Quote         @relation(fields: [quoteId], references: [id])
   region       Region?       @relation(fields: [regionId], references: [id])
-  city         City?         @relation(fields: [cityId], references: [id])
   maestro      User?         @relation(fields: [maestroId], references: [id])
   pagos        Payment[]
   garantias    WarrantyCase[]
