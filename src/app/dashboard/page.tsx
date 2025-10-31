@@ -120,7 +120,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Segunda fila de tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Garantías */}
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
             <div className="flex items-center justify-between">
@@ -162,6 +162,23 @@ export default async function DashboardPage() {
               Ver todos →
             </Link>
           </div>
+
+          {/* REPORTES */}
+          <Link
+            href="/dashboard/reportes"
+            className="block bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-md hover:shadow-xl transition-all transform hover:scale-105 p-6 text-white border-l-4 border-pink-600"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-white/90">Reportes</p>
+                <p className="text-3xl font-bold text-white mt-2">📊</p>
+              </div>
+              <div className="text-4xl">📈</div>
+            </div>
+            <div className="text-sm text-white/90 mt-4 inline-block">
+              Ver análisis →
+            </div>
+          </Link>
         </div>
 
         {/* Enlaces rápidos */}
@@ -203,9 +220,9 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Próximamente */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Funcionalidades del Sistema</h3>
+        {/* Estado del Sistema */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">✅ Sistema Completo</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✅ Gestión de servicios - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Sistema de cotizaciones con IA - <span className="text-green-600 font-semibold">Completado</span></li>
@@ -213,7 +230,7 @@ export default async function DashboardPage() {
             <li>✅ Panel de maestros - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Sistema de garantías - <span className="text-green-600 font-semibold">Completado</span></li>
             <li>✅ Gestión de pagos - <span className="text-green-600 font-semibold">Completado</span></li>
-            <li>🔄 Reportes y métricas</li>
+            <li>✅ Reportes y métricas - <span className="text-green-600 font-semibold">Completado</span></li>
           </ul>
         </div>
       </div>
