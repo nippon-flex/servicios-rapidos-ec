@@ -45,10 +45,17 @@ export async function POST(request: Request) {
       return sum + (Number(item.cantidad) * Number(item.precioUnitario))
     }, 0)
 
-    const tasaImpuesto = Number(lead.region.impuesto) / 100
-    const impuesto = aplicarIVA ? subtotal * tasaImpuesto : 0
+    // Aplicar impuesto solo si hay región configurada
+    let impuesto = 0
+    if (aplicarIVA && lead.region) {
+      const tasaImpuesto = 0.15 // 15% IVA por defecto
+      impuesto = subtotal * tasaImpuesto
+    }
+
     const total = subtotal + impuesto
-    const anticipoPorcentaje = Number(lead.region.anticipoPct) / 100
+
+    // Calcular anticipo (30% por defecto)
+    const anticipoPorcentaje = 0.30
     const anticipo = total * anticipoPorcentaje
     const saldo = total - anticipo
 
@@ -65,17 +72,9 @@ export async function POST(request: Request) {
     const codigo = `CT-${year}${month}-${secuencia}`
 
     console.log('🔢 Código:', codigo)
-
-    // Fecha expiración
-    const validezDias = 7
-    const fechaExpira = new Date()
-    fechaExpira.setDate(fechaExpira.getDate() + validezDias)
-
-    console.log('📅 Expira:', fechaExpira.toISOString())
-
-    // Crear cotización con items
     console.log('🚀 Creando cotización...')
 
+    // Crear cotización con items
     const quote = await prisma.quote.create({
       data: {
         codigo,
@@ -86,17 +85,13 @@ export async function POST(request: Request) {
         total,
         anticipo,
         saldo,
-        validezDias,
-        fechaExpira,
         estado: 'BORRADOR',
         items: {
-          create: items.map((item: any, index: number) => ({
-            tipo: 'MANO_OBRA',
+          create: items.map((item: any) => ({
             descripcion: item.descripcion,
             cantidad: Number(item.cantidad),
             precioUnitario: Number(item.precioUnitario),
             total: Number(item.cantidad) * Number(item.precioUnitario),
-            orden: index,
           })),
         },
       },
@@ -110,10 +105,10 @@ export async function POST(request: Request) {
     // Actualizar lead
     await prisma.lead.update({
       where: { id: leadId },
-      data: { estado: 'COTIZANDO' },
+      data: { estado: 'COTIZADO' },
     })
 
-    console.log('✅ Lead actualizado a COTIZANDO')
+    console.log('✅ Lead actualizado a COTIZADO')
 
     return NextResponse.json({
       success: true,
