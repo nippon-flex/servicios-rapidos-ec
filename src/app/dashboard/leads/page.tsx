@@ -19,7 +19,7 @@ export default async function LeadsPage() {
   const stats = {
     total: leads.length,
     nuevos: leads.filter(l => l.estado === 'NUEVO').length,
-    urgentes: leads.filter(l => l.urgente).length,
+    urgentes: leads.filter(l => l.urgencia === 'urgente').length,
   }
 
   return (
@@ -144,14 +144,14 @@ export default async function LeadsPage() {
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           lead.estado === 'NUEVO' ? 'bg-green-100 text-green-800' :
                           lead.estado === 'CONTACTADO' ? 'bg-blue-100 text-blue-800' :
-                          lead.estado === 'COTIZANDO' ? 'bg-yellow-100 text-yellow-800' :
+                          lead.estado === 'COTIZADO' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           {lead.estado}
                         </span>
                         
                         {/* Badge de urgente */}
-                        {lead.urgente && (
+                        {lead.urgencia === 'urgente' && (
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                             🚨 URGENTE
                           </span>
@@ -164,11 +164,11 @@ export default async function LeadsPage() {
                       <div className="flex flex-col gap-2">
                         {/* Botón WhatsApp */}
                         <a
-  href={`https://wa.me/${lead.clienteTelefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.clienteNombre}, te contacto sobre tu solicitud ${lead.codigo}`)}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="text-green-600 hover:text-green-900 font-medium"
->
+                          href={`https://wa.me/${lead.clienteTelefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.clienteNombre}, te contacto sobre tu solicitud ${lead.codigo}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-600 hover:text-green-900 font-medium"
+                        >
                           📱 WhatsApp
                         </a>
                         
