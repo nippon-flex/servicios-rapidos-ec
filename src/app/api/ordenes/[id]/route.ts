@@ -61,7 +61,7 @@ export async function PATCH(
       data: {
         maestroId: body.maestroId || null,
         estado: body.estado || undefined,
-        notasAdmin: body.notasAdmin || undefined,
+        notasInternas: body.notasInternas || undefined,
       },
       include: {
         maestro: true,
