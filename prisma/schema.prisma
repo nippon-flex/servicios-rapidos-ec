@@ -1,8 +1,8 @@
-// prisma/schema.prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -10,300 +10,285 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== ORGANIZACIÓN ====================
+// ============================================
+// ORGANIZACIONES Y REGIONES
+// ============================================
 
 model Organization {
-  id            String   @id @default(cuid())
-  nombre        String
-  slug          String   @unique
-  logo          String?
-  ownerId       String
-  
-  regiones      Region[]
-  usuarios      User[]
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id        String   @id @default(cuid())
+  nombre    String
+  pais      String
+  ciudad    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  regiones  Region[]
+  usuarios  User[]
+  leads     Lead[]
+
   @@map("organizations")
 }
 
-// ==================== REGIONES ====================
-
 model Region {
-  id              String   @id @default(cuid())
-  organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  
-  pais            String
-  ciudad          String
-  moneda          String   @default("USD")
-  timezone        String   @default("America/Guayaquil")
-  
-  impuesto        Decimal  @default(0) @db.Decimal(5,2)
-  anticipoPct     Int      @default(30)
-  garantiaDias    Int      @default(90)
-  
-  politicas       Json?
-  
-  leads           Lead[]
-  cotizaciones    Quote[]
-  ordenes         Order[]
-  servicios       Service[]
-  maestros        User[]   @relation("MaestrosRegion")
-  
-  activo          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@unique([organizationId, pais, ciudad])
-  @@map("regiones")
+  id        String   @id @default(cuid())
+  orgId     String
+  ciudad    String
+  pais      String
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  organization Organization @relation(fields: [orgId], references: [id])
+  leads        Lead[]
+  quotes       Quote[]
+  orders       Order[]
+  usuarios     User[]
+
+  @@map("regions")
 }
 
-// ==================== USUARIOS ====================
+// ============================================
+// CIUDADES (NUEVO)
+// ============================================
+
+model City {
+  id          String   @id @default(cuid())
+  nombre      String   // Quito, Caracas, Lima
+  slug        String   @unique // quito, caracas, lima (para URLs)
+  pais        String   // Ecuador, Venezuela, Perú
+  bandera     String?  // 🇪🇨, 🇻🇪, 🇵🇪
+  
+  // Contacto
+  telefono    String
+  whatsapp    String
+  email       String
+  
+  // Áreas de cobertura
+  zonas       String[] // ["La Carolina", "Cumbayá", "Tumbaco"]
+  
+  // Configuración
+  activa      Boolean  @default(true)
+  timezone    String   @default("America/Guayaquil")
+  moneda      String   @default("USD")
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relaciones
+  leads       Lead[]
+  quotes      Quote[]
+  orders      Order[]
+  maestros    User[]
+  
+  @@map("cities")
+}
+
+// ============================================
+// USUARIOS (MAESTROS Y ADMINS)
+// ============================================
 
 enum RolUsuario {
-  OWNER
   ADMIN
   MAESTRO
 }
 
 model User {
-  id              String      @id @default(cuid())
-  clerkId         String?     @unique
-  organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  
-  nombre          String
-  email           String?     @unique
-  telefono        String
-  ci              String?
-  
-  rol             RolUsuario
-  regionId        String?
-  region          Region?     @relation("MaestrosRegion", fields: [regionId], references: [id])
-  
-  especialidades  String[]
-  calificacion    Decimal?    @db.Decimal(3,2)
-  
-  cuentaBanco     String?
-  
-  activo          Boolean     @default(true)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  
-  ordenesAsignadas Order[]
-  pagosRecibidos   MaestroPago[] @relation("PagosMaestro")
-  
+  id             String      @id @default(cuid())
+  clerkId        String?     @unique
+  nombre         String
+  email          String?
+  telefono       String?
+  ci             String?
+  rol            RolUsuario  @default(MAESTRO)
+  organizationId String
+  regionId       String?
+  cityId         String?
+  especialidades String[]
+  cuentaBanco    String?
+  activo         Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relaciones
+  organization      Organization  @relation(fields: [organizationId], references: [id])
+  region            Region?       @relation(fields: [regionId], references: [id])
+  city              City?         @relation(fields: [cityId], references: [id])
+  ordenesAsignadas  Order[]
+  pagos             MaestroPago[]
+
   @@map("users")
 }
 
-// ==================== SERVICIOS ====================
+// ============================================
+// SERVICIOS
+// ============================================
 
 model Service {
-  id              String   @id @default(cuid())
-  regionId        String
-  region          Region   @relation(fields: [regionId], references: [id])
-  
-  slug            String
-  nombre          String
-  descripcion     String
-  icono           String?
-  
-  precioBase      Decimal  @db.Decimal(10,2)
-  unidad          String
-  
-  checklist       Json?
-  
-  orden           Int      @default(0)
-  activo          Boolean  @default(true)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  leads           Lead[]
-  
-  @@unique([regionId, slug])
+  id          String   @id @default(cuid())
+  nombre      String
+  descripcion String
+  icono       String?
+  slug        String   @unique
+  precioBase  Decimal  @default(0) @db.Decimal(10, 2)
+  unidad      String   @default("servicio")
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  leads Lead[]
+
   @@map("services")
 }
 
-// ==================== LEADS ====================
+// ============================================
+// LEADS (SOLICITUDES)
+// ============================================
 
 enum EstadoLead {
   NUEVO
   CONTACTADO
-  COTIZANDO
+  COTIZADO
+  RECHAZADO
   CONVERTIDO
-  DESCARTADO
 }
 
 model Lead {
-  id              String      @id @default(cuid())
-  codigo          String      @unique
-  
-  regionId        String
-  region          Region      @relation(fields: [regionId], references: [id])
-  
-  serviceId       String
-  service         Service     @relation(fields: [serviceId], references: [id])
-  
-  clienteNombre   String
-  clienteTelefono String
-  clienteEmail    String?
-  direccion       String
-  referencia      String?
-  
-  descripcion     String      @db.Text
-  fotos           String[]
-  urgente         Boolean     @default(false)
-  
-  fuente          String?
-  utmSource       String?
-  utmCampaign     String?
-  
-  estado          EstadoLead  @default(NUEVO)
-  
-  aiAnalisis      Json?
-  
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  
-  cotizaciones    Quote[]
-  
-  @@index([estado, createdAt])
+  id                String      @id @default(cuid())
+  codigo            String      @unique
+  organizationId    String
+  regionId          String?
+  cityId            String?
+  serviceId         String
+  clienteNombre     String
+  clienteTelefono   String
+  clienteEmail      String?
+  direccion         String
+  descripcion       String
+  urgencia          String      @default("normal")
+  fotos             String[]
+  estado            EstadoLead  @default(NUEVO)
+  notas             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relaciones
+  organization Organization @relation(fields: [organizationId], references: [id])
+  region       Region?      @relation(fields: [regionId], references: [id])
+  city         City?        @relation(fields: [cityId], references: [id])
+  service      Service      @relation(fields: [serviceId], references: [id])
+  cotizaciones Quote[]
+
   @@map("leads")
 }
 
-// ==================== COTIZACIONES ====================
+// ============================================
+// COTIZACIONES
+// ============================================
 
 enum EstadoQuote {
   BORRADOR
   ENVIADA
-  VISTA
   APROBADA
   RECHAZADA
-  EXPIRADA
   CONVERTIDA
 }
 
 model Quote {
-  id              String      @id @default(cuid())
-  codigo          String      @unique
-  
-  leadId          String
-  lead            Lead        @relation(fields: [leadId], references: [id])
-  
-  regionId        String
-  region          Region      @relation(fields: [regionId], references: [id])
-  
-  items           QuoteItem[]
-  
-  subtotal        Decimal     @db.Decimal(10,2)
-  impuesto        Decimal     @db.Decimal(10,2)
-  total           Decimal     @db.Decimal(10,2)
-  
-  anticipo        Decimal     @db.Decimal(10,2)
-  saldo           Decimal     @db.Decimal(10,2)
-  
-  validezDias     Int         @default(7)
-  fechaExpira     DateTime
-  
-  pdfUrl          String?
-  
-  estado          EstadoQuote @default(BORRADOR)
-  
-  enviadaEn       DateTime?
-  aprobadaEn      DateTime?
-  
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  
-  orden           Order?
-  
-  @@index([estado, createdAt])
+  id             String      @id @default(cuid())
+  codigo         String      @unique
+  leadId         String
+  regionId       String?
+  cityId         String?
+  subtotal       Decimal     @default(0) @db.Decimal(10, 2)
+  impuesto       Decimal     @default(0) @db.Decimal(10, 2)
+  total          Decimal     @default(0) @db.Decimal(10, 2)
+  anticipo       Decimal     @default(0) @db.Decimal(10, 2)
+  saldo          Decimal     @default(0) @db.Decimal(10, 2)
+  validaHasta    DateTime?
+  estado         EstadoQuote @default(BORRADOR)
+  mensajeIA      String?
+  notas          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relaciones
+  lead         Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  region       Region?     @relation(fields: [regionId], references: [id])
+  city         City?       @relation(fields: [cityId], references: [id])
+  items        QuoteItem[]
+  orden        Order?
+
   @@map("quotes")
 }
 
-enum TipoQuoteItem {
-  MANO_OBRA
-  MATERIAL
-  VISITA
-  URGENCIA
-  OTRO
-}
-
 model QuoteItem {
-  id              String        @id @default(cuid())
+  id              String   @id @default(cuid())
   quoteId         String
-  quote           Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade)
-  
-  tipo            TipoQuoteItem
   descripcion     String
-  cantidad        Decimal       @db.Decimal(10,2)
-  precioUnitario  Decimal       @db.Decimal(10,2)
-  total           Decimal       @db.Decimal(10,2)
-  
-  orden           Int           @default(0)
-  
+  cantidad        Decimal  @db.Decimal(10, 2)
+  precioUnitario  Decimal  @db.Decimal(10, 2)
+  total           Decimal  @db.Decimal(10, 2)
+  createdAt       DateTime @default(now())
+
+  // Relaciones
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
   @@map("quote_items")
 }
 
-// ==================== ÓRDENES ====================
+// ============================================
+// ÓRDENES DE TRABAJO
+// ============================================
 
 enum EstadoOrder {
   ANTICIPO_PENDIENTE
   ANTICIPO_PAGADO
-  AGENDADA
-  EN_CAMINO
   EN_EJECUCION
   FINALIZADA
-  SALDO_PENDIENTE
   CERRADA
-  CANCELADA
 }
 
 model Order {
-  id              String       @id @default(cuid())
-  codigo          String       @unique
-  
-  quoteId         String       @unique
-  quote           Quote        @relation(fields: [quoteId], references: [id])
-  
-  regionId        String
-  region          Region       @relation(fields: [regionId], references: [id])
-  
-  maestroId       String?
-  maestro         User?        @relation(fields: [maestroId], references: [id])
-  costoMaestro    Decimal      @default(0) @db.Decimal(10,2)
-  margen          Decimal      @default(0) @db.Decimal(10,2)
-  
-  fechaAgendada   DateTime?
-  fechaInicio     DateTime?
-  fechaFin        DateTime?
-  
-  fotosAntes      String[]
-  fotosDurante    String[]
-  fotosDespues    String[]
-  
-  checklistData   Json?
-  
-  estado          EstadoOrder  @default(ANTICIPO_PENDIENTE)
-  
-  notasAdmin      String?      @db.Text
-  notasMaestro    String?      @db.Text
-  
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  
-  pagos           Payment[]
-  garantias       WarrantyCase[]
-  pagosMaestro    MaestroPago[] @relation("PagosMaestroOrden")
-  
-  @@index([estado, maestroId])
+  id             String      @id @default(cuid())
+  codigo         String      @unique
+  quoteId        String      @unique
+  regionId       String?
+  cityId         String?
+  maestroId      String?
+  costoMaestro   Decimal     @default(0) @db.Decimal(10, 2)
+  margen         Decimal     @default(0) @db.Decimal(10, 2)
+  estado         EstadoOrder @default(ANTICIPO_PENDIENTE)
+  fechaInicio    DateTime?
+  fechaFin       DateTime?
+  fotosAntes     String[]
+  fotosDurante   String[]
+  fotosDespues   String[]
+  notasInternas  String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relaciones
+  quote        Quote         @relation(fields: [quoteId], references: [id])
+  region       Region?       @relation(fields: [regionId], references: [id])
+  city         City?         @relation(fields: [cityId], references: [id])
+  maestro      User?         @relation(fields: [maestroId], references: [id])
+  pagos        Payment[]
+  garantias    WarrantyCase[]
+
   @@map("orders")
 }
 
-// ==================== PAGOS ====================
+// ============================================
+// PAGOS
+// ============================================
 
 enum TipoPago {
   ANTICIPO
@@ -318,27 +303,45 @@ enum MetodoPago {
 }
 
 model Payment {
-  id              String      @id @default(cuid())
-  orderId         String
-  order           Order       @relation(fields: [orderId], references: [id])
-  
-  tipo            TipoPago
-  metodo          MetodoPago
-  monto           Decimal     @db.Decimal(10,2)
-  
-  comprobanteUrl  String?
-  referencia      String?
-  
-  validado        Boolean     @default(false)
-  validadoPor     String?
-  
-  fecha           DateTime    @default(now())
-  createdAt       DateTime    @default(now())
-  
+  id             String      @id @default(cuid())
+  orderId        String
+  tipo           TipoPago
+  metodo         MetodoPago
+  monto          Decimal     @db.Decimal(10, 2)
+  comprobanteUrl String?
+  referencia     String?
+  validado       Boolean     @default(false)
+  validadoPor    String?
+  fecha          DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+
+  // Relaciones
+  order Order @relation(fields: [orderId], references: [id])
+
   @@map("payments")
 }
 
-// ==================== GARANTÍAS ====================
+model MaestroPago {
+  id             String      @id @default(cuid())
+  maestroId      String
+  orderId        String?
+  monto          Decimal     @db.Decimal(10, 2)
+  metodo         MetodoPago
+  referencia     String?
+  comprobanteUrl String?
+  notas          String?
+  fecha          DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+
+  // Relaciones
+  maestro User @relation(fields: [maestroId], references: [id])
+
+  @@map("maestros_pagos")
+}
+
+// ============================================
+// GARANTÍAS
+// ============================================
 
 enum EstadoGarantia {
   REPORTADA
@@ -350,76 +353,39 @@ enum EstadoGarantia {
 }
 
 model WarrantyCase {
-  id              String          @id @default(cuid())
-  codigo          String          @unique
-  
-  orderId         String
-  order           Order           @relation(fields: [orderId], references: [id])
-  
-  clienteReporte  String          @db.Text
-  fotos           String[]
-  fechaReporte    DateTime        @default(now())
-  
-  cubierta        Boolean?
-  motivoRechazo   String?         @db.Text
-  
-  ordenReparacion String?
-  resolucion      String?         @db.Text
-  
-  estado          EstadoGarantia  @default(REPORTADA)
-  
-  resueltaEn      DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  
+  id               String         @id @default(cuid())
+  codigo           String         @unique
+  orderId          String
+  clienteReporte   String
+  fotos            String[]
+  fechaReporte     DateTime       @default(now())
+  cubierta         Boolean?
+  motivoRechazo    String?
+  ordenReparacion  String?
+  resolucion       String?
+  estado           EstadoGarantia @default(REPORTADA)
+  resueltaEn       DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  // Relaciones
+  order Order @relation(fields: [orderId], references: [id])
+
   @@map("warranty_cases")
 }
 
-// ==================== AUDITORÍA ====================
+// ============================================
+// AUDITORÍA
+// ============================================
 
 model AuditLog {
-  id              String   @id @default(cuid())
-  
-  entidad         String
-  entidadId       String
-  accion          String
-  
-  userId          String?
-  userName        String?
-  
-  antes           Json?
-  despues         Json?
-  
-  ip              String?
-  userAgent       String?
-  
-  createdAt       DateTime @default(now())
-  
-  @@index([entidad, entidadId])
-  @@index([createdAt])
+  id        String   @id @default(cuid())
+  userId    String?
+  accion    String
+  entidad   String
+  entidadId String?
+  detalles  String?
+  createdAt DateTime @default(now())
+
   @@map("audit_logs")
-}
-
-// ==================== PAGOS A MAESTROS ====================
-
-model MaestroPago {
-  id              String   @id @default(cuid())
-  
-  maestroId       String
-  maestro         User     @relation("PagosMaestro", fields: [maestroId], references: [id])
-  
-  orderId         String?
-  order           Order?   @relation("PagosMaestroOrden", fields: [orderId], references: [id])
-  
-  monto           Decimal  @db.Decimal(10,2)
-  metodo          MetodoPago
-  referencia      String?
-  comprobanteUrl  String?
-  
-  notas           String?  @db.Text
-  
-  fecha           DateTime @default(now())
-  createdAt       DateTime @default(now())
-  
-  @@map("maestro_pagos")
 }
