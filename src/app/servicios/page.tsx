@@ -1,24 +1,14 @@
 import { prisma } from '@/lib/prisma';
-import { formatearMoneda } from '@/lib/utils';
 import Link from 'next/link';
 
 export default async function ServiciosPublicosPage() {
-  // Obtener región de Quito
-  const region = await prisma.region.findFirst({
-    where: {
-      ciudad: 'Quito',
-      pais: 'Ecuador',
-    },
-  });
-
-  // Obtener servicios activos
+  // ✅ SOLO usamos campos que SÍ existen
   const servicios = await prisma.service.findMany({
     where: {
-      regionId: region?.id,
       activo: true,
     },
     orderBy: {
-      orden: 'asc',
+      nombre: 'asc',  // ← Ordenar por nombre (orden no existe)
     },
   });
 
@@ -77,7 +67,9 @@ export default async function ServiciosPublicosPage() {
                 className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6 border border-gray-100"
               >
                 {/* Icono */}
-                <div className="text-5xl mb-4">{servicio.icono}</div>
+                <div className="text-5xl mb-4">
+                  {servicio.icono || '🛠️'}
+                </div>
                 
                 {/* Nombre */}
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -85,30 +77,17 @@ export default async function ServiciosPublicosPage() {
                 </h3>
                 
                 {/* Descripción */}
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                <p className="text-gray-600 text-sm mb-4">
                   {servicio.descripcion}
                 </p>
                 
-                {/* Precio */}
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <span className="text-sm text-gray-500">Desde</span>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {formatearMoneda(Number(servicio.precioBase))}
-                    </p>
-                  </div>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    por {servicio.unidad}
-                  </span>
-                </div>
-                
                 {/* Botón */}
-<Link
-  href={`/solicitar?servicio=${servicio.slug}`}
-  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-lg font-semibold transition-all hover:scale-105"
->
-  📝 Solicitar Servicio
-</Link>
+                <Link
+                  href={`/solicitar?servicio=${servicio.id}`}
+                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                >
+                  📝 Solicitar Servicio
+                </Link>
               </div>
             ))}
           </div>
